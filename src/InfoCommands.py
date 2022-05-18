@@ -13,7 +13,8 @@ class Info(commands.Cog):
             "rps": "Rock, paper, scissors game.",
             "coinflip": "A game of heads or tails.",
             "ttt": "A game of Tic-Tac-Toe. To understand how to play the game, refer to the number chart below:\n:black_large_square::red_square::black_large_square::red_square::black_large_square:   —>   1 ... 2 ... 3\n:red_square::red_square::red_square::red_square::red_square:\n:black_large_square::red_square::black_large_square::red_square::black_large_square:   —>   4 ... 5 ... 6\n:red_square::red_square::red_square::red_square::red_square:\n:black_large_square::red_square::black_large_square::red_square::black_large_square:   —>   7 ... 8 ... 9\nEach number corresponds to a space on the board.\nType one of the given numbers to mark an unoccupied space.",
-            "maze": "A 2D maze game with friendly UI. You must first obtain the flag (🚩) before escaping!"
+            "maze": "A 2D maze game with friendly UI. You must first obtain the flag (🚩) before escaping!",
+            "cups": "A game only reserved for the keenest observers."
             }
         if command:
             try:
@@ -24,7 +25,7 @@ class Info(commands.Cog):
             finally:
                 return
         help_msg = discord.Embed(title="help", description="Displays this message. Use ?help <command> for more info.")
-        help_msg.add_field(name="List of Game Commands:", value="ping\ncoinflip\nrps\nttt\nmaze")
+        help_msg.add_field(name="List of Game Commands:", value="ping\ncoinflip\nrps\nttt\nmaze\ncups")
         await ctx.channel.send(embed=help_msg)
 
 

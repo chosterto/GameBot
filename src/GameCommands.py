@@ -26,7 +26,7 @@ class Games(commands.Cog):
             check=lambda msg: msg.content in ("rock", "paper", "scissors")
             and msg.channel == ctx.channel 
             and msg.author == ctx.author
-            )
+        )
         
         user.choose_shape(response.content)
         bot.choose_random_shape()
@@ -55,7 +55,7 @@ class Games(commands.Cog):
             check=lambda msg: msg.content.lower() in ("heads", "tails")
             and msg.channel == ctx.channel
             and msg.author == ctx.author
-            )
+        )
         side = side.content.lower()
         
         if random() > 0.5:
@@ -82,7 +82,7 @@ class Games(commands.Cog):
             check=lambda msg: msg.content in ("easy", "hard")
             and msg.channel == ctx.channel 
             and msg.author == ctx.author
-            )
+        )
         bot_select_space = ttt.bot_random if difficulty.content == "easy" else ttt.bot_smart
 
         bot_goes_first = random() > 0.5
@@ -97,7 +97,7 @@ class Games(commands.Cog):
                 check=lambda msg: msg.content in list(map(str, [*range(1, 10)]))
                 and msg.channel == ctx.channel
                 and msg.author == ctx.author
-                )
+            )
             await space.delete()
             space = int(space.content)
             if ttt.is_space_unoccupied(space):
@@ -149,7 +149,7 @@ class Games(commands.Cog):
                 "reaction_add", 
                 check=lambda react, user: str(react.emoji) in ("⬆️", "⬇️", "⬅️", "➡️", "⏹️")
                 and user == ctx.author 
-                )
+            )
             emote = str(reaction)
             
             if emote == "⏹️":
@@ -167,6 +167,53 @@ class Games(commands.Cog):
         # await board.delete()
         # await prompt.delete()
         
+        self.active = False
+    
+    
+    @commands.command()
+    async def cups(self, ctx):
+        if self.active:
+            return
+        self.active = True
+
+        cupball = helpers.Cupball()
+
+        cups = await ctx.channel.send(cupball.display())
+        await asyncio.sleep(1.5)
+        cupball.hide_balls()
+        await cups.edit(content=cupball.display())
+
+        while not cupball.is_swapping_done():
+            await asyncio.sleep(1)
+            cupball.select_cups()
+            await cups.edit(content=cupball.display())
+            await asyncio.sleep(0.5)
+            cupball.swap_cups()
+            await cups.edit(content=cupball.display())
+            await asyncio.sleep(0.75)
+            cupball.place_cups()
+            await cups.edit(content=cupball.display())
+        
+        await ctx.channel.send(
+            embed=discord.Embed(
+                title="Which cup contains the green ball?",
+                description="Type '1' for the left cup, '2' for the middle cup, or '3' for the right cup"
+            )
+        )
+        user_cup = await self.bot.wait_for(
+            "message", 
+            check=lambda msg: msg.content in ('1', '2', '3')
+            and msg.channel == ctx.channel
+            and msg.author == ctx.author
+        )
+        cupball.reveal_balls()
+        await cups.edit(content=cupball.display())
+
+        if cupball.has_green_ball(int(user_cup.content)):
+            await ctx.channel.send("Correct! :smile:")
+        else:
+            await ctx.channel.send("Wrong ball! :x:")
+
         self.active = False
 
 

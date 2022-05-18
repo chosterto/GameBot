@@ -17,5 +17,5 @@ class Cell:
             "down": True, 
             "left": True, 
             "right": True
-            }
+        }
         
