@@ -23,6 +23,7 @@ class Cupball:
         self.count = 5
         self.cup1 = None
         self.cup2 = None
+        self.temp = None
         
         self.cups = [
             Cup(2, self.LEFT, self.red_ball),
@@ -56,10 +57,13 @@ class Cupball:
         self.cups[self.cup2].x += 1
     
 
-    def swap_cups(self):
-        c1 = self.cup1
-        c2 = self.cup2
-        self.cups[c1].y, self.cups[c2].y = self.cups[c2].y, self.cups[c1].y
+    def swap_cup1(self):
+        self.temp = self.cups[self.cup1].y
+        self.cups[self.cup1].y = self.cups[self.cup2].y
+    
+
+    def swap_cup2(self):
+        self.cups[self.cup2].y = self.temp
     
 
     def place_cups(self):
