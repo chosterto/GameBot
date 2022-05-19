@@ -135,9 +135,18 @@ class Games(commands.Cog):
 
         maze.initialize_pos()
 
-        board = await ctx.channel.send(maze.display())
+        board = await ctx.channel.send(maze.display_hidden())
 
-        prompt = await ctx.channel.send(":arrow_up: — Go up.\n:arrow_down: — Go down.\n:arrow_left: — Go left.\n:arrow_right: — Go right.\n:stop_button: — Stop the game.")
+        prompt = await ctx.channel.send(
+            embed=discord.Embed(
+                title="The Maze Game",
+                description=""":arrow_up: — Go up.\n
+                :arrow_down: — Go down.\n
+                :arrow_left: — Go left.\n
+                :arrow_right: — Go right.\n
+                :stop_button: — Stop the game."""
+            )
+        )
         await prompt.add_reaction("⬆️")
         await prompt.add_reaction("⬇️")
         await prompt.add_reaction("⬅️")
@@ -160,8 +169,9 @@ class Games(commands.Cog):
             if maze.is_flag_reached():
                 maze.remove_barrier()
 
-            await board.edit(content=maze.display())
+            await board.edit(content=maze.display_hidden())
         
+        await board.edit(content=maze.display_unhidden())
         await ctx.channel.send(embed=discord.Embed(title="Game is finished. Type ?maze to play again!"))
         # await asyncio.sleep(2)
         # await board.delete()
