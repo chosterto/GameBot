@@ -9,6 +9,8 @@ class Games(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.active = False
+        self.to_message = "Timed out! :hourglass:"
+        self.timeout = 30.0
 
 
     @commands.command()
@@ -21,12 +23,18 @@ class Games(commands.Cog):
         bot = helpers.RPS()
 
         await ctx.channel.send("Rock :rock:, Paper :newspaper:, or Scissors :scissors:?\n\nType rock, paper, or scissors to select one.")
-        response = await self.bot.wait_for(
-            "message", 
-            check=lambda msg: msg.content in ("rock", "paper", "scissors")
-            and msg.channel == ctx.channel 
-            and msg.author == ctx.author
-        )
+        try:
+            response = await self.bot.wait_for(
+                "message", 
+                check=lambda msg: msg.content in ("rock", "paper", "scissors")
+                and msg.channel == ctx.channel 
+                and msg.author == ctx.author,
+                timeout=self.timeout
+            )
+        except asyncio.TimeoutError:
+            await ctx.channel.send(self.to_message)
+            self.active = False
+            return
         
         user.choose_shape(response.content)
         bot.choose_random_shape()
@@ -50,12 +58,19 @@ class Games(commands.Cog):
         self.active = True
 
         await ctx.channel.send("Heads or Tails?")
-        side = await self.bot.wait_for(
-            "message", 
-            check=lambda msg: msg.content.lower() in ("heads", "tails")
-            and msg.channel == ctx.channel
-            and msg.author == ctx.author
-        )
+        try:
+            side = await self.bot.wait_for(
+                "message", 
+                check=lambda msg: msg.content.lower() in ("heads", "tails")
+                and msg.channel == ctx.channel
+                and msg.author == ctx.author,
+                timeout=self.timeout
+            )
+        except asyncio.TimeoutError:
+            await ctx.channel.send(self.to_message)
+            self.active = False
+            return
+
         side = side.content.lower()
         
         if random() > 0.5:
@@ -77,12 +92,19 @@ class Games(commands.Cog):
         ttt = helpers.TicTacToe()
 
         await ctx.channel.send("Select a difficulty: easy or hard.")
-        difficulty = await self.bot.wait_for(
-            "message", 
-            check=lambda msg: msg.content in ("easy", "hard")
-            and msg.channel == ctx.channel 
-            and msg.author == ctx.author
-        )
+        try:
+            difficulty = await self.bot.wait_for(
+                "message", 
+                check=lambda msg: msg.content in ("easy", "hard")
+                and msg.channel == ctx.channel 
+                and msg.author == ctx.author,
+                timeout=self.timeout
+            )
+        except asyncio.TimeoutError:
+            await ctx.channel.send(self.to_message)
+            self.active = False
+            return
+
         bot_select_space = ttt.bot_random if difficulty.content == "easy" else ttt.bot_smart
 
         bot_goes_first = random() > 0.5
@@ -92,12 +114,19 @@ class Games(commands.Cog):
         board = await ctx.channel.send(ttt.display())
 
         while not ttt.is_finished():
-            space = await self.bot.wait_for(
-                "message", 
-                check=lambda msg: msg.content in list(map(str, [*range(1, 10)]))
-                and msg.channel == ctx.channel
-                and msg.author == ctx.author
-            )
+            try:
+                space = await self.bot.wait_for(
+                    "message", 
+                    check=lambda msg: msg.content in list(map(str, [*range(1, 10)]))
+                    and msg.channel == ctx.channel
+                    and msg.author == ctx.author,
+                    timeout=self.timeout
+                )
+            except asyncio.TimeoutError:
+                await ctx.channel.send(self.to_message)
+                self.active = False
+                return
+
             await space.delete()
             space = int(space.content)
             if ttt.is_space_unoccupied(space):
@@ -154,11 +183,17 @@ class Games(commands.Cog):
         await prompt.add_reaction("⏹️")
 
         while not maze.is_end_reached():
-            reaction, _ = await self.bot.wait_for(
-                "reaction_add", 
-                check=lambda react, user: str(react.emoji) in ("⬆️", "⬇️", "⬅️", "➡️", "⏹️")
-                and user == ctx.author 
-            )
+            try:
+                reaction, _ = await self.bot.wait_for(
+                    "reaction_add", 
+                    check=lambda react, user: str(react.emoji) in ("⬆️", "⬇️", "⬅️", "➡️", "⏹️")
+                    and user == ctx.author,
+                    timeout=self.timeout
+                )
+            except asyncio.TimeoutError:
+                await ctx.channel.send(self.to_message)
+                self.active = False
+                return
             emote = str(reaction)
             
             if emote == "⏹️":
@@ -213,12 +248,18 @@ class Games(commands.Cog):
                 description="Type '1' for the left cup, '2' for the middle cup, or '3' for the right cup"
             )
         )
-        user_cup = await self.bot.wait_for(
-            "message", 
-            check=lambda msg: msg.content in ('1', '2', '3')
-            and msg.channel == ctx.channel
-            and msg.author == ctx.author
-        )
+        try:
+            user_cup = await self.bot.wait_for(
+                "message", 
+                check=lambda msg: msg.content in ('1', '2', '3')
+                and msg.channel == ctx.channel
+                and msg.author == ctx.author,
+                timeout=self.timeout
+            )
+        except asyncio.TimeoutError:
+            await ctx.channel.send(self.to_message)
+            self.active = False
+            return
         cupball.reveal_balls()
         await cups.edit(content=cupball.display())
 
