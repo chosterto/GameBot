@@ -7,6 +7,7 @@ import helpers
 
 class Games(commands.Cog):
     def __init__(self, bot):
+        # this is a test
         self.bot = bot
         self.active = False
         self.to_message = "Timed out! :hourglass:"
